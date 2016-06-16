@@ -37,8 +37,8 @@ long long convert_to_digit(const char roman[])
     long long numeral_value = 0;
     char previous_roman = '$';
     unsigned int roman_length = strlen(roman);
-
-    for (int i = roman_length - 1; i >= 0; i--)
+    int i;
+    for (i = roman_length - 1; i >= 0; i--)
     {
         // If a lesser numeral is put before a bigger it means subtraction of the lesser from the bigger.
         if (digit(roman[i]) < digit(previous_roman))
@@ -58,16 +58,10 @@ long long convert_to_digit(const char roman[])
 // Convert integer to Roman
 void convert_to_roman(char* roman, long long numeral_value)
 {
-    // If result is negative, output '-' first.
-    if (numeral_value < 0)
-    {
-        roman[0] = '-';
-        roman[1] = '\0';
-    }
-    numeral_value *= (-1);
     // Loop through all possible supported values. Start with the MAX possible value. And if remainer is greater than current 
     // supported value, keep subtracting until remainer is smaller than current value. Move on to next one.
-    for (int i = 0; (numeral_value > 0) && i < (sizeof(NumeralLookUpTable) / sizeof(NumeralLookUpTable[0])); i++)
+    int i;
+    for (i = 0; (numeral_value > 0) && i < (sizeof(NumeralLookUpTable) / sizeof(NumeralLookUpTable[0])); i++)
     {
         while (numeral_value >= NumeralLookUpTable[i].possible_value)
         {
@@ -77,18 +71,19 @@ void convert_to_roman(char* roman, long long numeral_value)
     }
 }
 
-char* add(char* a, char* b)
+void add(char* output, const char* a, const char* b)
 {
+    strcpy(output, "");
     long long result = convert_to_digit(a) + convert_to_digit(b);
-    char roman_result[MAXROMANLETTER] = "";
-    convert_to_roman(roman_result, result);
-    return(roman_result);
+    convert_to_roman(output, result);
 }
 
-char* sub(char* a, char* b)
+void sub(char* output, const char* a, const char* b)
 {
+    strcpy(output, "");
     long long result = convert_to_digit(a) - convert_to_digit(b);
-    char roman_result[MAXROMANLETTER] = "";
-    convert_to_roman(roman_result, result);
-    return(roman_result);
+    // When result is less or equal to zero, Roman numeral doesnt exist...
+    if (result >0)
+        convert_to_roman(output, result);
+    printf("here %s\n", output);
 }

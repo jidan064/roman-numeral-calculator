@@ -4,13 +4,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAXROMANLETTER  100
 typedef struct
 {
     unsigned int possible_value;
     const char*  roman_symbol;
 } NumeralElement;
 
-char* add(char* a, char* b);
-char* sub(char* a, char* b);
+void add(char* output, const char* a, const char* b);
+void sub(char* output, const char* a, const char* b);
 #endif
