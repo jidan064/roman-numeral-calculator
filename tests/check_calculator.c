@@ -1,19 +1,41 @@
-#include "../src/RomanNumeralCalculator.h"
+#include "../src/RomanNumeral.h"
 #include <check.h>
 
-START_TEST(test_two_plus_two)
+char output[100] = "";
+FILE* fp;
+START_TEST(test_file)
 {
-    char output[10] = ""; 
-    add(output, "II", "II");
-    ck_assert_str_eq(output, "IV");
-}
-END_TEST
-
-START_TEST(test_equal_subtract_null)
-{
-    char output[10] = "";
-    sub(output, "IV", "IV");
-    ck_assert_msg (!strcmp(output,""), "Empty string should be returned when subtracting two equal Roman Numeral");
+    // Open testcase file. 1st value is a, 2nd value is b, and 3rd is sum.
+    char buff[256];
+    fp = fopen("testcase.txt", "r");
+    if (fp != NULL)
+    {
+        char a[100], b[100], sum[100];
+        char* token;
+        while(fgets(buff, 255, fp) != NULL)
+        {
+            // read in a, b and sum
+            token = strtok(buff," \n");
+            strcpy(a, token);
+            token = strtok(NULL," \n");
+            strcpy(b, token);
+            token = strtok(NULL," \n");
+            strcpy(sum, token);
+            // perform operation and check
+            // Addition
+            add(output, a, b);
+            ck_assert_str_eq(output, sum);
+            // swap a and b
+            add(output, b, a);
+            ck_assert_str_eq(output, sum);
+            // Subtraction
+            sub(output, sum, a);
+            ck_assert_str_eq(output, b);
+            sub(output, sum, b);
+            ck_assert_str_eq(output, a);
+        }
+    }
+    fclose(fp);
 }
 END_TEST
 
@@ -22,21 +44,13 @@ calculator_suite (void)
 {
   Suite *s = suite_create ("Calculator");
 
-  /* Core test case */
-  TCase *tc_core = tcase_create ("Core");
-  tcase_add_test (tc_core, test_two_plus_two);
-  tcase_add_test (tc_core, test_equal_subtract_null);
+  /* test case */
+  TCase *tc_core = tcase_create ("AddAndSub");
+  tcase_add_test (tc_core, test_file);
   suite_add_tcase (s, tc_core);
-
-  /* Limits test case */
-  //TCase *tc_limits = tcase_create ("Limits");
-  //tcase_add_test (tc_limits, test_money_create_neg);
-  //tcase_add_test (tc_limits, test_money_create_zero);
-  //suite_add_tcase (s, tc_limits);
 
   return s;
 }
-
 
 int main(void)
 {
