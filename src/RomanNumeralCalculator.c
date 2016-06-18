@@ -117,54 +117,72 @@ char* concatenate_and_sort_string(char* str1, char* str2)
     return concat_str;
 }
 
+// Struct for grouping and substituion
+typedef struct
+{
+    const char* str1;
+    const char* str2;
+} RomanNumeralMapElem;
+
+RomanNumeralMapElem ReplaceMap[] = {
+    {"IIIII", "V"},
+    {"VV", "X"},
+    {"XXXXX", "L"},
+    {"LL", "C"},
+    {"CCCCC", "D"},
+    {"DD", "M"},
+    {"0", NULL}
+};
+
+RomanNumeralMapElem SpecialReplaceMap[] = {
+    {"DCCCC", "CM"},
+    {"CCCC", "CD"},
+    {"LXXXX", "XC"},
+    {"XXXX", "XL"},
+    {"VIIII", "IX"},
+    {"IIII", "IV"},
+    {"0", NULL}
+};
+
 // 3. Group smaller numeral to bigger
 // 4. Substitute all substractives to legal Roman Numeral
 char* group_and_construct_output(char* str)
 {
     // Group
-    char* newStr_0 = str_replace(str, "IIIII", "V");
-    char* newStr_1 = str_replace(newStr_0, "VV", "X");
-    char* newStr_2 = str_replace(newStr_1, "XXXXX", "L");
-    char* newStr_3 = str_replace(newStr_2, "LL", "C");
-    char* newStr_4 = str_replace(newStr_3, "CCCCC", "D");
-    char* newStr_5 = str_replace(newStr_4, "DD", "M");
-    // Substitute
-    char* newStr_6 = str_replace(newStr_5, "DCCCC", "CM");
-    char* newStr_7 = str_replace(newStr_6, "CCCC", "CD");
-    char* newStr_8 = str_replace(newStr_7, "LXXXX", "XC");
-    char* newStr_9 = str_replace(newStr_8, "XXXX", "XL");
-    char* newStr_10 = str_replace(newStr_9, "VIIII", "IX");
-    char* newStr = str_replace(newStr_10, "IIII", "IV");
+    RomanNumeralMapElem* temp = ReplaceMap;
+    char* src = str;
+    while(strcmp((*temp).str1, "0"))
+    {
+        char* newStr = str_replace(src, (*temp).str1, (*temp).str2);
+        free(src);
+        src = newStr;
+        temp++;
+    }
 
-    free(str);
-    free(newStr_0);
-    free(newStr_1);
-    free(newStr_2);
-    free(newStr_3);
-    free(newStr_4);
-    free(newStr_5);
-    free(newStr_6);
-    free(newStr_7);
-    free(newStr_8);
-    free(newStr_9);
-    free(newStr_10);
-    return newStr;
+    temp = SpecialReplaceMap;
+    while(strcmp((*temp).str1, "0"))
+    {
+        char* newStr = str_replace(src, (*temp).str1, (*temp).str2);
+        free(src);
+        src = newStr;
+        temp++;
+    }
+
+    return src;
 }
 
 char* replace_subtractive_string(char* str)
 {
-    char* newStr_0 = str_replace(str, "CM", "DCCCC");
-    char* newStr_1 = str_replace(newStr_0, "CD", "CCCC");
-    char* newStr_2 = str_replace(newStr_1, "XC", "LXXXX");
-    char* newStr_3 = str_replace(newStr_2, "XL", "XXXX");
-    char* newStr_4 = str_replace(newStr_3, "IX", "VIIII");
-    char* newStr = str_replace(newStr_4, "IV", "IIII");
-    free(newStr_0);
-    free(newStr_1);
-    free(newStr_2);
-    free(newStr_3);
-    free(newStr_4);
-    return newStr;
+    RomanNumeralMapElem* temp = SpecialReplaceMap;
+    char* src = str;
+    while(strcmp((*temp).str1, "0"))
+    {
+        char* newStr = str_replace(src, (*temp).str2, (*temp).str1);
+        free(src);
+        src = newStr;
+        temp++;
+    }
+    return src;
 }
 
 // Remove all common strings within str1 and str2
@@ -210,8 +228,10 @@ char* add(char* str1, char* str2)
     // Step1
     // Substitute for any subtractives
     // For calculation, we replace all subtractives with original Numeral.
-    char* newStr1 = replace_subtractive_string(str1);
-    char* newStr2 = replace_subtractive_string(str2);
+    char* src1 = strdup(str1);
+    char* src2 = strdup(str2);
+    char* newStr1 = replace_subtractive_string(src1);
+    char* newStr2 = replace_subtractive_string(src2);
     // Step2
     // Concatenat and sort both strings
     char* concatenated_str = concatenate_and_sort_string(newStr1, newStr2);
@@ -234,8 +254,10 @@ char* sub(char* str1, char* str2)
     // Step1
     // Substitute for any subtractives
     // For calculation, we replace all subtractives with original Numeral.
-    char* newStr1 = replace_subtractive_string(str1);
-    char* newStr2 = replace_subtractive_string(str2);
+    char* src1 = strdup(str1);
+    char* src2 = strdup(str2);
+    char* newStr1 = replace_subtractive_string(src1);
+    char* newStr2 = replace_subtractive_string(src2);
 
     // Step2
     remove_common_numeral(newStr1, newStr2);
