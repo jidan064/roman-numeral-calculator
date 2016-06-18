@@ -1,6 +1,48 @@
 #include "../src/RomanNumeral.h"
 #include <check.h>
 
+// Romain numeral convert to integer
+typedef struct
+{
+    unsigned int possible_value;
+    const char*  roman_symbol;
+} NumeralElement;
+
+// Define all possible values
+const NumeralElement LookUpTable[] = {
+    {1000, "M"},
+    {900, "CM"},
+    {500, "D"},
+    {400, "CD"},
+    {100, "C"},
+    {90, "XC"},
+    {50, "L"},
+    {40, "XL"},
+    {10, "X"},
+    {9, "IX"},
+    {5, "V"},
+    {4, "IV"},
+    {1, "I"}
+};
+
+// Convert integer to Roman
+void convert_to_roman(char* roman, unsigned int numeral_value)
+{
+    strcpy(roman, "");
+    // Loop through all possible supported values. Start with the MAX possible value. And if remainer is greater than current 
+    // supported value, keep subtracting until remainer is smaller than current value. Move on to next one.
+    int i;
+    for (i = 0; (numeral_value > 0) && i < (sizeof(LookUpTable) / sizeof(LookUpTable[0])); i++)
+    {
+        while (numeral_value >= LookUpTable[i].possible_value)
+        {
+            numeral_value -= LookUpTable[i].possible_value;
+
+            strcat(roman, LookUpTable[i].roman_symbol);
+        }
+    }
+}
+
 char output[100] = "";
 FILE* fp;
 START_TEST(test_file)
@@ -23,19 +65,49 @@ START_TEST(test_file)
             strcpy(sum, token);
             // perform operation and check
             // Addition
-            add(output, a, b);
-            ck_assert_str_eq(output, sum);
-            // swap a and b
-            add(output, b, a);
-            ck_assert_str_eq(output, sum);
+            char* result = add(a,b);
+            ck_assert_str_eq(result, sum);
+            free(result);
+            result = add(b,a);
+            ck_assert_str_eq(result, sum);
+            free(result);
             // Subtraction
-            sub(output, sum, a);
-            ck_assert_str_eq(output, b);
-            sub(output, sum, b);
-            ck_assert_str_eq(output, a);
+            result = sub(sum, a);
+            ck_assert_str_eq(result, b);
+            free(result);
+            result = sub(sum, b);
+            ck_assert_str_eq(result, a);
+            free(result);
         }
     }
     fclose(fp);
+}
+END_TEST
+
+START_TEST(test_exhaust)
+{
+    int i, j;
+    char a[100], b[100], sum[100];
+    for (i=1; i < 1001; i = i + 3)
+        for (j=i; j < 1001; j = j + 3)
+        {
+            convert_to_roman(a, i);
+            convert_to_roman(b, j);
+            convert_to_roman(sum, i+j);
+            char* result = add(a,b);
+            ck_assert_str_eq(result, sum);
+            free(result);
+            result = add(b,a);
+            ck_assert_str_eq(result, sum);
+            free(result);
+            // Subtraction
+            result = sub(sum, a);
+            ck_assert_str_eq(result, b);
+            free(result);
+            result = sub(sum, b);
+            ck_assert_str_eq(result, a);
+            free(result);
+        }
 }
 END_TEST
 
@@ -47,6 +119,7 @@ calculator_suite (void)
   /* test case */
   TCase *tc_core = tcase_create ("AddAndSub");
   tcase_add_test (tc_core, test_file);
+  tcase_add_test (tc_core, test_exhaust);
   suite_add_tcase (s, tc_core);
 
   return s;
