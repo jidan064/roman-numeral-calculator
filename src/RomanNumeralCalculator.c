@@ -1,7 +1,7 @@
 /*************************************************************************
  * Description: Implementation of Roman Numeral ADD/SUB functions
 *************************************************************************/
-#include "RomanNumeral.h"
+#include "RomanNumeralCalculator.h"
 // Define bool since compiler doesnt support it
 typedef enum { false, true } bool;
 

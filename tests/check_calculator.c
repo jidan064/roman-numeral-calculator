@@ -1,4 +1,4 @@
-#include "../src/RomanNumeral.h"
+#include "../src/RomanNumeralCalculator.h"
 #include <check.h>
 
 // Romain numeral convert to integer

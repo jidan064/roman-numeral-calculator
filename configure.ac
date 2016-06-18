@@ -5,7 +5,7 @@ AC_PREREQ([2.59])
 AC_INIT([Calculator], [0.3], [check-devel AT lists.sourceforge.net])
 
 # unique source file --- primitive safety check 
-AC_CONFIG_SRCDIR([src/RomanNumeral.c])
+AC_CONFIG_SRCDIR([src/RomanNumeralCalculator.c])
 
 # place to put some extra build scripts installed
 AC_CONFIG_AUX_DIR([build-aux])
