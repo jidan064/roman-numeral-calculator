@@ -227,7 +227,8 @@ char* add(char* str1, char* str2)
 // 1. substitute all subtractives with its original Numeral. For instamce, IV would be substitute with IIII.
 // 2. cross out all common numerals
 // 3. Break down big numeral into small ones until str2 is empty
-// 4. Substitute all substractives to legal Roman Numeral
+// 4. Group strings
+// 5.Substitute all substractives to legal Roman Numeral
 char* sub(char* str1, char* str2)
 {
     // Step1
@@ -237,8 +238,10 @@ char* sub(char* str1, char* str2)
     char* newStr2 = replace_subtractive_string(str2);
 
     // Step2
-    // Process when string 2 is not empty
     remove_common_numeral(newStr1, newStr2);
+ 
+    // Step3
+    // Process when string 2 is not empty
     while(strcmp(newStr2, ""))
     {
         char* temp;
@@ -270,5 +273,8 @@ char* sub(char* str1, char* str2)
                 break;
         }
     }
+
+    // Step4-5
+    // If Step3 is done properly, there should not be any group needed.
     return group_and_construct_output(newStr1);
 }
