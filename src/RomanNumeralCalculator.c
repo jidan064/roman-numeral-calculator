@@ -2,6 +2,7 @@
  * Description: Implementation of Roman Numeral ADD/SUB functions
 *************************************************************************/
 #include "RomanNumeralCalculator.h"
+#include "assert.h"
 // Define bool since compiler doesnt support it
 typedef enum { false, true } bool;
 
@@ -182,6 +183,20 @@ char* replace_subtractive_string(char* str)
         src = newStr;
         temp++;
     }
+
+    char* temp_src = src;
+    char prev_numeral = *temp_src;
+    // Loop through string to make sure this string is a valid Roman Numeral
+    while(*temp_src != '\0')
+    {
+        if (compare_roman_letter(*temp_src, prev_numeral) == true)
+        {
+            free(src);
+            return("0");
+        }
+        prev_numeral = *temp_src;
+        temp_src++;
+    }
     return src;
 }
 
@@ -232,6 +247,10 @@ char* add(char* str1, char* str2)
     char* src2 = strdup(str2);
     char* newStr1 = replace_subtractive_string(src1);
     char* newStr2 = replace_subtractive_string(src2);
+    if (!strcmp(newStr1, "0") || !strcmp(newStr2, "0"))
+    {
+        return ("Invalid inputs");
+    }
     // Step2
     // Concatenat and sort both strings
     char* concatenated_str = concatenate_and_sort_string(newStr1, newStr2);
@@ -258,44 +277,63 @@ char* sub(char* str1, char* str2)
     char* src2 = strdup(str2);
     char* newStr1 = replace_subtractive_string(src1);
     char* newStr2 = replace_subtractive_string(src2);
+    if (!strcmp(newStr1, "0") || !strcmp(newStr2, "0"))
+    {
+        return ("Invalid inputs");
+    }
 
     // Step2
     remove_common_numeral(newStr1, newStr2);
- 
+    // If string 1 is already empty, illegal inputs
+    if (!strcmp(newStr1, ""))
+    {
+        free(newStr1);
+        free(newStr2);
+        return("Invalid inputs");
+    }
     // Step3
     // Process when string 2 is not empty
     while(strcmp(newStr2, ""))
     {
-        char* temp;
-        // loop through string 2 in reverse order
-        for (temp = newStr2 + strlen(newStr2) - 1; temp >= newStr2; --temp)
+        // Smallest Roman Numeral in string 2
+        char* temp = newStr2 + strlen(newStr2) - 1;
+        // loop through string 1 in reverse order
+        char* temp_str1 = newStr1 + strlen(newStr1) - 1;
+        bool valid = false;
+        while(temp_str1 >= newStr1)
         {
-            char* temp_str1;
-            for (temp_str1 = newStr1 + strlen(newStr1) - 1; temp_str1 >= newStr1; --temp_str1)
+            // found a bigger one, break it down to next level
+            if (compare_roman_letter(*temp_str1, *temp) == true)
             {
-                // found a bigger one, break it down to next level
-                if (compare_roman_letter(*temp_str1, *temp) == true)
-                {
-                    char* replacement;
-                    switch(*temp_str1) {
-                        case 'M':   replacement = "DD"; break;
-                        case 'D':   replacement = "CCCCC"; break;
-                        case 'C':   replacement = "LL"; break;
-                        case 'L':   replacement = "XXXXX"; break;
-                        case 'X':   replacement = "VV"; break;
-                        case 'V':   replacement = "IIIII"; break;
-                    }
-                    char* newStr1_temp = replace_single_occurance(newStr1, temp_str1, convert_char_to_str(*temp_str1), replacement);
-                    newStr1 = newStr1_temp;
-                    remove_common_numeral(newStr1, newStr2);
-                    break;
+                valid = true;
+                char* replacement;
+                switch(*temp_str1) {
+                    case 'M':   replacement = "DD"; break;
+                    case 'D':   replacement = "CCCCC"; break;
+                    case 'C':   replacement = "LL"; break;
+                    case 'L':   replacement = "XXXXX"; break;
+                    case 'X':   replacement = "VV"; break;
+                    case 'V':   replacement = "IIIII"; break;
                 }
-            }
-            if (*newStr2 == '\0' || temp > newStr2 + strlen(newStr2) - 1)
+                char* newStr1_temp = replace_single_occurance(newStr1, temp_str1, convert_char_to_str(*temp_str1), replacement);
+                // new pointer to the location of replacement
+                newStr1 = newStr1_temp;
+                remove_common_numeral(newStr1, newStr2);
                 break;
+            }
+            else 
+                temp_str1--;
+        }
+        // If valid is not set, which means there is no bigger numeral in string1 that can be broken down.
+        // Indicates string1 is not greater than string2
+        if (valid == false)
+        {
+            free(newStr1);
+            free(newStr2);
+            return("Invalid inputs");
         }
     }
-
+    free(newStr2);
     // Step4-5
     // If Step3 is done properly, there should not be any group needed.
     return group_and_construct_output(newStr1);

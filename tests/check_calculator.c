@@ -78,9 +78,19 @@ START_TEST(test_file)
             result = sub(sum, b);
             ck_assert_str_eq(result, a);
             free(result);
+            // check invalid inputs
+            ck_assert_str_eq(sub(a,sum), "Invalid inputs");
         }
     }
     fclose(fp);
+}
+END_TEST
+
+START_TEST(test_illegal_case)
+{
+    ck_assert_str_eq(sub("I", "II"), "Invalid inputs");
+    ck_assert_str_eq(sub("I", "I"), "Invalid inputs");
+    ck_assert_str_eq(add("XM", "I"), "Invalid inputs");
 }
 END_TEST
 
@@ -120,6 +130,7 @@ calculator_suite (void)
   TCase *tc_core = tcase_create ("AddAndSub");
   tcase_add_test (tc_core, test_file);
   tcase_add_test (tc_core, test_exhaust);
+  tcase_add_test (tc_core, test_illegal_case);
   suite_add_tcase (s, tc_core);
 
   return s;
